@@ -1,11 +1,13 @@
 name: Auto commit
 
 on:
-  workflow_dispatch:  # 手动触发（用于首次启动）
-  workflow_run:  # 当前工作流结束后再次触发自己
-    workflows: ["Auto commit"]
-    types:
-      - completed
+
+  push:
+    branches:
+      - master
+      
+  schedule:
+  - cron: "0 */3 * * *" # See https://crontab.guru/#0_7,9,11_*_*_1,3
 
 jobs:
   auto_commit:
@@ -13,24 +15,10 @@ jobs:
     steps:
       - name: DEBUG 
         run: echo "::debug::Ref = ${{github.ref}}"
-        
-      - name: Generate Random Delay
-        id: delay
-        run: |
-          # 生成一个 2 到 5 小时（7200 到 18000 秒）之间的随机延迟时间
-          RANDOM_DELAY=$((7200 + RANDOM % 10800))
-          echo "Random delay: $RANDOM_DELAY seconds"
-          echo "::set-output name=delay::$RANDOM_DELAY"
-        
-      - name: Delay Job
-        run: |
-          echo "Waiting for ${{ steps.delay.outputs.delay }} seconds..."
-          sleep ${{ steps.delay.outputs.delay }}
-
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v3      
         with:
-          persist-credentials: false
-          fetch-depth: 0
+         persist-credentials: false
+         fetch-depth: 0
 
       - name: Modify last update
         run: |
