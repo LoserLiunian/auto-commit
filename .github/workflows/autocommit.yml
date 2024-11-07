@@ -1,12 +1,11 @@
 name: Auto commit
 
 on:
-  push:
-    branches:
-      - master
-  workflow_dispatch: # 手动触发
-  schedule:
-    - cron: "0 * * * *" # 每小时检查一次
+  workflow_dispatch:  # 手动触发（用于首次启动）
+  workflow_run:  # 当前工作流结束后再次触发自己
+    workflows: ["Auto commit"]
+    types:
+      - completed
 
 jobs:
   auto_commit:
